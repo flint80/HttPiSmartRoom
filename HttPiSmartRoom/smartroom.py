@@ -75,11 +75,16 @@ def main(args):
                 util.logger.debug("analyzing device config %s" % fileName)
                 deviceConfig = util.readConfig(fileName)
                 name = deviceConfig['name']
-                deviceType = deviceConfig['type']
-                driverClass = driversRegistry[deviceType]
-                driverInstance = driverClass(deviceConfig)
-                httpConfig.mapping[name] = driverInstance
-                util.logger.info("device %s was successfully registered" % name)
+                enabled = True 
+                if "enabled" in deviceConfig:
+                    enabled = "true" == deviceConfig["enabled"]
+                
+                if enabled:
+                    deviceType = deviceConfig['type']
+                    driverClass = driversRegistry[deviceType]
+                    driverInstance = driverClass(deviceConfig)
+                    httpConfig.mapping[name] = driverInstance
+                    util.logger.info("device %s was successfully registered" % name)
         
         # stop running server
         wasRunning = False
