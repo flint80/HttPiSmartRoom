@@ -85,10 +85,14 @@ class GetHandler(BaseHTTPRequestHandler):
                 return
             except:
                 util.logger.error("unable to get value for query %s, \n details: %s" % (self.path, traceback.format_exc()))
-                self.send_response(400)
-                self.end_headers()
-                self.wfile.write("error")
-                return
+                try:
+                    self.send_response(400)
+                    self.end_headers()
+                    self.wfile.write("error")
+                    return
+                except:
+                    util.logger.error("unable to send response, \n details: %s" % (traceback.format_exc()))
+                    return
         util.logger.warn("unknown request type %s" % self.path)
         self.send_response(200)
         self.end_headers()
