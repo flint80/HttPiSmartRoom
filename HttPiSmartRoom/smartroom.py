@@ -9,6 +9,7 @@ import os
 PROJECT_ROOT = os.path.dirname(__file__)
 sys.path.insert(0, os.path.join(PROJECT_ROOT, "libs"))
 
+
 from server.http import HttpServerConfiguration, HttpServer
 import httplib
 import threading
@@ -83,6 +84,7 @@ def main(args):
                     deviceType = deviceConfig['type']
                     driverClass = driversRegistry[deviceType]
                     driverInstance = driverClass(deviceConfig)
+                    #util.logger.debug("device %s was instantiated" % name)
                     httpConfig.mapping[name] = driverInstance
                     util.logger.info("device %s was successfully registered" % name)
         
