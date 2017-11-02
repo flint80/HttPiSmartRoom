@@ -40,4 +40,9 @@ try:
     registry['MPD'] = player.MPD
 except ImportError:
     util.logger.warning("unable to load module MPD, reason %s"  % traceback.format_exc()  )
+try:
+    from drivers import k30
+    registry['K30'] = k30.K30
+except ImportError:
+    util.logger.warning("unable to load module K30, reason %s"  % traceback.format_exc()  )    
 
