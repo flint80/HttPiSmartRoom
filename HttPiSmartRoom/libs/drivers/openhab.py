@@ -5,7 +5,7 @@ Created on Oct 21, 2015
 '''
 import httplib
 import traceback
-from common import util
+from utils import util
 import threading
 import urllib2
 

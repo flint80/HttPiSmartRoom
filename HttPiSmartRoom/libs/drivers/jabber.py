@@ -3,7 +3,7 @@ Created on Oct 21, 2015
 
 @author: avramenko
 '''
-from common import util
+from utils import util
 import xmpppy2
 import httplib
 from urlparse import urlparse

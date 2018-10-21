@@ -6,7 +6,7 @@ Created on Oct 20, 2015
 from BaseHTTPServer import HTTPServer, BaseHTTPRequestHandler
 import urlparse
 import threading
-from common import util
+from utils import util
 import traceback
 
 httpConfig = None
@@ -145,6 +145,7 @@ class HttpServer():
         global httpConfig, server
         httpConfig = conf
         server = HTTPServer(('', httpConfig.port), GetHandler)
+        print "server started"
         server.serve_forever()
         
         

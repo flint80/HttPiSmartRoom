@@ -4,6 +4,9 @@ Created on Oct 20, 2015
 @author: avramenko
 '''
 import logging
+import os
+if not os.path.isdir("temp"):
+    os.mkdir("temp")
 logging.basicConfig(filename='temp/smartroom.log', filemode='a', format='%(asctime)-15s %(levelname)6s: %(message)s', level=logging.DEBUG)
 
 import sys
@@ -17,7 +20,7 @@ from server.http import HttpServerConfiguration, HttpServer
 import httplib
 import threading
 import time
-import common.util as util
+import utils.util as util
 from drivers import registry as driversRegistry
 import traceback
 
@@ -85,7 +88,7 @@ def main(args):
                     deviceType = deviceConfig['type']
                     driverClass = driversRegistry[deviceType]
                     driverInstance = driverClass(deviceConfig)
-                    #util.logger.debug("device %s was instantiated" % name)
+                    #utils.logger.debug("device %s was instantiated" % name)
                     httpConfig.mapping[name] = driverInstance
                     util.logger.info("device %s was successfully registered" % name)
         
@@ -105,8 +108,9 @@ def main(args):
         h.setDaemon(True)
         h.start()
         HttpServer(httpConfig)
+
     except:
         print "unable to start server %s" % traceback.format_exc()
-        util.logger.error("unable to start server %s" , traceback.format_exc())
+        util.logger.error("unable to start server %s", traceback.format_exc())
         
 main(sys.argv)        

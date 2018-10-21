@@ -5,7 +5,7 @@ Created on 20 нояб. 2016 г.
 @author: avramenko
 '''
 
-from common import util
+from utils import util
 import threading
 import serial
 import time

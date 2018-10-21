@@ -6,7 +6,7 @@ Created on Oct 21, 2015
 import os
 import subprocess
 import time
-from common import util
+from utils import util
 
 class Ds18b20():
     '''
