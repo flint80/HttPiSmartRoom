@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//HttPiSmartRoom/libs/drivers/arduino.py=utf-8
 encoding//HttPiSmartRoom/libs/drivers/irsensor.py=utf-8
 encoding//HttPiSmartRoom/libs/drivers/k30.py=utf-8
 encoding//RPIO/PWM/__init__.py=utf-8

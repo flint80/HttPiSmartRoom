@@ -3,6 +3,9 @@ Created on Oct 20, 2015
 
 @author: avramenko
 '''
+import logging
+logging.basicConfig(filename='temp/smartroom.log', filemode='a', format='%(asctime)-15s %(levelname)6s: %(message)s', level=logging.DEBUG)
+
 import sys
 import os
 
@@ -16,7 +19,6 @@ import threading
 import time
 import common.util as util
 from drivers import registry as driversRegistry
-import logging
 import traceback
 
 
@@ -68,7 +70,6 @@ def main(args):
             if arg == 'stop':
                 stopServer()
                 return
-        logging.basicConfig(filename='temp/smartroom.log', filemode='a', format='%(asctime)-15s %(levelname)6s: %(message)s', level=logging.DEBUG)
         # initializing handlers registry
         for entry in os.listdir('devices'):
             fileName = "devices/%s" % entry

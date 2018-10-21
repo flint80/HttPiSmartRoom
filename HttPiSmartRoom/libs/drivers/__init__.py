@@ -5,12 +5,14 @@ import manager
 import ds18b20
 import jabber
 import openhab
+
 registry = {}
 registry['FAKE'] = fake.FakeDevice
 registry['MANAGER'] = manager.Manager
 registry['JABBER'] = jabber.Jabber
 registry['OPENHAB'] = openhab.Openhab
 registry['DS18B20'] = ds18b20.Ds18b20
+
 try:
     import gnokii
     registry['GNOKII'] = gnokii.Gnokii
@@ -45,4 +47,9 @@ try:
     registry['K30'] = k30.K30
 except ImportError:
     util.logger.warning("unable to load module K30, reason %s"  % traceback.format_exc()  )    
+try:
+    from drivers import arduino
+    registry['ARDUINO'] = arduino.Arduino
+except ImportError:
+    util.logger.warning("unable to load module ARDUINO, reason %s"  % traceback.format_exc()  )    
 

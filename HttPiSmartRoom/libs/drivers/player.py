@@ -21,7 +21,11 @@ class MPD():
         '''
         Constructor
         '''
-        self.songId = params['songId']
+        if "songpos" in params:
+            self.songpos = int(params['songpos'])
+        else:
+            self.songpos = 0
+                
         self.server = params['server']
 
             
@@ -37,7 +41,7 @@ class MPD():
                 if status['state'] == 'play':
                     client.stop()
                 else:
-                    client.playid(self.songId)    
+                    client.play(self.songpos)    
             finally:        
                 client.close()                     # send the close command
                 client.disconnect()
