@@ -1,0 +1,5 @@
+установить расширения
+1. ui habmin
+2. bindings - http, ntp
+3. persistance rrd4j
+4. trasformation RegEx Transformation

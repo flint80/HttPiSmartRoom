@@ -1,0 +1,22 @@
+Group All
+Group Temperatures (All)
+Group Humidities (All)
+Group BoilerRoom (All)
+Group Bedroom (All)
+Group Cabinet (All)
+Group Termostats (All)
+Group Valves (All)
+Group CO2 (All)
+Number T_boiler_reverse_heat "Т обратки отопления [%.1f C]" <temperature> (BoilerRoom, Temperatures) {http="<[http://192.168.1.37:8000/read/tb:60000:REGEX((.*))]" }
+Number T_bedroom "Т в спальне [%.1f C]" <temperature> (Bedroom, Temperatures) {http="<[http://192.168.1.35:18000/read/temperature:60000:REGEX((.*))]" }
+Number H_bedroom "H в спальне [%.1f %%]" <rain> (Bedroom, Humidities) {http="<[http://192.168.1.35:18000/read/humidity:60000:REGEX((.*))]" }
+Number TS_bedroom "Термостат спальня [%.0f C]" <temperature> (Bedroom, Termostats)
+Number TS_cabinet "Термостат кабинет [%.0f C]" <temperature> (Cabinet, Termostats)
+Number Valve_bedroom "Клапан отопления в спальне  [%.0f]" <temperature> (Bedroom, Valves) {http="<[http://192.168.1.36:18085/read/arduino?command=relay1READ:60000:REGEX((.*))] >[*:POST:http://192.168.1.36:18085/write/arduino?command=relay1%2$s]" }
+Number Valve_cabinet "Клапан отопления в кабинете  [%.0f]" <temperature> (Cabinet, Valves) {http="<[http://192.168.1.36:18085/read/arduino?command=relay2READ:60000:REGEX((.*))] >[*:POST:http://192.168.1.36:18085/write/arduino?command=relay2%2$s]" }
+Number CO2_bedroom "CO2 в спальне [%.0f ppm]" <wind> (Bedroom, CO2) {http="<[http://192.168.1.35:18000/read/k30:60000:REGEX((.*))]" }
+Number CO2_cabinet "CO2 в кабинете [%.0f ppm]" <wind> (Cabinet, CO2) {http="<[http://192.168.1.44:18085/read/arduino?command=co2:60000:REGEX((.*))]" }
+Number T_cabinet "Т в кабинете [%.1f C]" <temperature> (Cabinet, Temperatures) {http="<[http://192.168.1.44:18085/read/arduino?command=t:60000:REGEX((.*))]"  }
+Number H_cabinet "H в кабинете [%.1f %%]" <rain> (Cabinet, Humidities) {http="<[http://192.168.1.44:18085/read/arduino?command=h:60000:REGEX((.*))]"  }
+
+Switch SummerMode "Летний режим" <switch> (Valves)

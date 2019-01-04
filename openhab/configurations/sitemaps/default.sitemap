@@ -1,0 +1,13 @@
+sitemap default label="Поместье4d"
+{
+	Frame label="Помещения" {
+		Group item=BoilerRoom
+		Group item=Bedroom
+		Group item=Cabinet
+		Setpoint icon="temperature" label="Термостат в спальне [%.1f C]"  item=TS_bedroom minValue=10 maxValue=27 step=1
+		Setpoint icon="temperature" label="Термостат в кабинете [%.1f C]"  item=TS_cabinet minValue=10 maxValue=27 step=1
+		Switch icon="switch" label="Летний режим" item=SummerMode
+	}
+
+	 
+}

@@ -1,0 +1,146 @@
+import java.util.Map
+import java.util.List
+import java.util.Date
+import java.io.File
+import java.io.FileReader
+import java.io.FileWriter
+import java.io.BufferedReader
+import java.text.SimpleDateFormat
+
+
+
+var String smsUrl  = "http://192.168.1.37:8000/write/sms?phone=89263633216"
+var double TS_delta = 0.5
+var Map<String, Double> lastTemperatures=newHashMap()
+var Map<String,Integer> tempValvesState = newHashMap()
+
+
+rule temperature
+when
+	Time cron "0 * * * * ?"
+then
+	var List<GenericItem> sensors = newArrayList(T_boiler_reverse_heat as GenericItem) 
+	var Map<String,Double> minTemperatures = newHashMap(T_boiler_reverse_heat.name -> 36d as Double)
+	var GenericItem summerModeSwitch = SummerMode
+	var summerMode = summerModeSwitch.state.toString()
+	if("ON" == summerMode){
+		logDebug("script", "summer mode is ON, skipping min temperature check")
+	} else {
+		for(GenericItem item: sensors){
+			var Double last = lastTemperatures.get(item.name)
+			var Double current = new Double(item.state.toString())
+			var Double min = minTemperatures.get(item.name) 
+			if(lastTemperatures.containsKey(item.name)){
+				if(last < min && current >= min){
+					logInfo("script", item.name + " is OK")
+					sendHttpPostRequest(smsUrl, "text/plain", item.name + " is OK")
+				} else if(last >= min && current < min){
+					logInfo("script", item.name + " is less then " + min)
+					sendHttpPostRequest(smsUrl, "text/plain", item.name + " is less than " + min)
+				}
+			} else if(current < min){
+					logInfo("script", item.name + " is less then " + min)
+					sendHttpPostRequest(smsUrl, "text/plain", item.name + " is less than " + min)
+			}	
+			lastTemperatures.put(item.name, current);
+		}
+	}
+end
+
+rule startup
+when
+	System started
+then
+	var File file = new File("etc/power.txt")
+	if(file.exists){
+		var FileReader inputStream = new FileReader(file)
+		try{
+			var  BufferedReader reader = new BufferedReader(inputStream)
+			var String content = reader.readLine()
+			logInfo("script", "no electricity from " + content)
+			sendHttpPostRequest(smsUrl, "text/plain", "no electricity from " + content)
+		} finally{
+			inputStream.close
+		}
+		
+	}
+end
+
+rule shutdown
+when
+	System shuts down
+then
+	logInfo("script", "system shuts down")
+	var File file = new File("etc/power.txt")
+	if(file.exists){
+		file.delete()
+	}
+end
+
+rule updatePowerFile
+when
+	Time cron "0 * * * * ?"
+then
+	//sendXMPP("flinty80@jabber.ru", "hello")
+	//sendXMPP("flinty80@jabber.ru/temperature", "hello", "http://localhost:8080/chart?groups=Temperatures&period=H&random=1&h=800&w=1200")
+	var File file = new File("etc/power.txt")
+	var FileWriter wr =  new FileWriter(file)
+	try{
+		var SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm")
+		wr.write(sdf.format(new Date()))
+		wr.flush()
+	} finally{
+		wr.close()
+	}
+end
+
+rule Termostats
+when
+	Time cron "0 * * * * ?"
+then
+	var List<GenericItem> termostats =  newArrayList(TS_bedroom as GenericItem,TS_cabinet as GenericItem)
+	var Map<String,GenericItem> sensorsMap = newHashMap(TS_bedroom.name -> T_bedroom as GenericItem,TS_cabinet.name -> T_cabinet as GenericItem)
+	var Map<String,GenericItem> valvesMap = newHashMap(TS_bedroom.name -> Valve_bedroom as GenericItem,TS_cabinet.name -> Valve_cabinet as GenericItem)
+	var Map<String,Boolean> inversions = newHashMap(TS_bedroom.name -> false,TS_cabinet.name -> true)
+	var GenericItem summerModeSwitch = SummerMode
+	var summerMode = summerModeSwitch.state.toString()
+	if(tempValvesState.isEmpty()){
+		tempValvesState.put(TS_bedroom.name, 0)
+		tempValvesState.put(TS_cabinet.name, 0)
+	}
+	for(GenericItem ts: termostats){
+		if(ts.state == NULL){
+			ts.postUpdate(22)
+		}
+		var currentTemp = new Double(sensorsMap.get(ts.name).state.toString())
+		var valveValue = tempValvesState.get(ts.name)
+		var ts_value = new Double(ts.state.toString())
+		var log0  = 0;
+		var log1  = 1;
+		if(inversions.get(ts.name)){
+			log0  = 1;
+			log1  = 0;
+		}
+		logDebug("script", "termostat is " + ts.name+", current temp is " + currentTemp +",ts_value is  " + ts_value +", valve is " + valveValue +", summer mode is " + summerMode)
+		if("ON" == summerMode){
+			logDebug("script", "setting valve to "+log0)
+			valvesMap.get(ts.name).sendCommand(log0)
+			tempValvesState.put(ts.name, log0)
+		} else if (currentTemp > (ts_value + TS_delta)){
+			logDebug("script", "setting valve to "+log0)
+			valvesMap.get(ts.name).sendCommand(log0)
+			tempValvesState.put(ts.name, log0)	
+		} else if (currentTemp < (ts_value - TS_delta)){
+			logDebug("script", "setting valve to "+log1)
+			valvesMap.get(ts.name).sendCommand(log1)
+			tempValvesState.put(ts.name, log1)	
+		} else {
+			logDebug("script", "preserving valve at " + valveValue)
+			valvesMap.get(ts.name).sendCommand(valveValue)
+		}
+	}
+end
+
+
+
+

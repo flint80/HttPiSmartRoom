@@ -24,7 +24,7 @@ class Arduino():
             cmd=queryParams['command']
             if not cmd or not cmd[0]:
                 raise Exception("no command specified")
-            self.serial.writelines(cmd[0]+"|")
+            self.serial.write(cmd[0]+"\n")
             time.sleep(1)
             resp = self.serial.readline();
             #ser.flushOutput()
